@@ -1,0 +1,6 @@
+[horizontal]
+bmc:: Baseboard management controller
+in-band:: Said of operations that take place from the operating system
+out-of-band:: Said of operations that are driven through the BMC
+
+oci-r

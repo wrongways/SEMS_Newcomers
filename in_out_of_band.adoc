@@ -1,0 +1,45 @@
+==== Levers for controlling frequency and power
+
+===== In-band and out-of-band
+Today's servers come with their own management system, known as the baseboard management controller
+or more colloquially the *bmc*. Operations that are applied to a server, boot, shutdown etc that take
+place via the bmc are said to be *out-of-band*. The same operations performed from the operating system
+are said to be *in-band*.
+
+Of the different interfaces that Smart Energy Management System uses the Intel runtime average power
+limit (rapl) interface — see <<Intel rapl,rapl>> below is in-bandfootnote:[The Nvidia system management
+interface (smi) for GPUs is also in-band, but this is not currently used by SEMS]. The other interfaces
+described below are out-of-band, relying on the bmc. The current trend is to move away from in-band
+monitoring and control towards more frequent use of out-of-band.
+
+
+===== Intel rapl
+The running average power limit (rapl) monitors and controls power for a CPU socket (package),
+the cores, the uncores (processor components other than the cores), and main memory (DRAM).
+Power consumption is sampled and averaged over a time window. The average is compared against
+the user-defined thresholds. If any of the limits are exceeded the on-board power management
+algorithm throttles the maximum CPU frequency accordingly. Power measurement is indirect through
+a set of hardware counters.
+
+Once limits have been set power consumption is managed by RAPL without intervention from an
+external management system.
+
+Capping and monitoring using rapl is in-band (from the operating system).
+
+
+===== Data centre manageability interface (DCMI)
+DCMI is an Intel standard for managing servers, including power through the baseboard management
+controller (BMC). Compliant platforms allow external management tools to monitor and control server
+power usage. The interface is coarse-grained compared to the running average power limit in that it
+provides controls and monitors for the overall system power.
+
+===== Intel Node Manager
+Intel Node Manager is a replacement for DCMI. It also uses the BMC to send commands to the
+on-chip management engine, with a subset of commands addressing power usage. It monitors
+power usage from the server, provides controls for maximum server power and can automatically
+reduce power consumption via CPU frequency.
+
+===== DMTF Redfish
+The distributed management task-force (DMTF) Redfish specification is an open standard that
+can be considered a competitor to the Intel DCMI. The Redfish specification covers a wide
+range of data centre management domains including server power and data centre power distribution.

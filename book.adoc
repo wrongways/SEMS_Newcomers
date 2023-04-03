@@ -1,0 +1,15 @@
+:author: Jez Wain
+:email: jez.wain@bull.net
+:toc: left
+:stem:
+
+
+= Smart Energy Management System
+
+// include::subjects.adoc[]
+
+include::01_intro.adoc[]
+
+= Glossary
+
+include::glossary.adoc[]

@@ -1,0 +1,78 @@
+== Introduction Collectively the HPC system providers, encouraged by a
+https://www.energy.gov/sites/prod/files/2013/09/f2/20130913-SEAB-DOE-
+Exascale-Initiative.pdf[2008 DARPA paper] have set themselves the
+ambition of attaining exascale performance (10^18^ FLOPS) with a power
+budget of 20&nbsp;MW. At the time of writing (2023) this works out at
+around €25k and 40 tonnes of CO~2~ per day. Even though 20&nbsp;MW is
+sufficient to power a town of 120,000 peoplefootnote:[From
+https://www.destatis.de/EN/Themes/Society-Environment/Environment/
+Material-Energy-Flows/Tables/electricity-consumption-households.html a
+two-person household consumes roughly 3,200 kWh per year: 20,000 kW *
+365 days * 24 hours / 3,200kWh * 2 people =~ 117,000 people. Towns of
+this size include Round Rock and Abilene in Texas, Metz and Rouen in
+France or Burton-upon-Trent and Eastbourne in the UK], to achieve this
+goal will require an order-of-magnitude improvement from where we are
+today. If we are to meet this ambitious but laudable goal then dramatic
+improvements are required across all facets of HPC data centres: power
+efficient circuits, energy conservation, peak power management, power
+delivery and cooling (server and data centre)footnote:[ If you're
+serious about conserving energy, I'd argue that you should not be on
+systems that use the x86 architecture]
+
+This paper presents Atos' Smart Energy Management System (SEMS) and how
+it fits in with the rest of the HPC cluster administration tools.
+
+SEMS provides tools to address peak power management with the goal of
+reducing the overall energy (and CO2) footprint and peak power on Atos’
+HPC clusters while minimizing service level degradation by adjusting
+server performance to the variations in workload demand within a given
+power budget.
+
+
+=== Smart Energy Management System components The Smart Energy
+Management System comprises two distinct components: 1) Energy optimizer
+(eo), and 2) dynamic power optimizer (dpo).
+
+==== Principles of operation Both of these components act upon computing
+power draw, either in the CPU or GPUfootnote:[In theory this could
+include other equipment such as network switches, power distribution
+units, uninterruptible power supplies, pumps, etc., but as is often the
+case, there's a big gap between theory and practice]. As a first-order
+approximation the power draw of an integrated circuit is a function of
+the cube of the frequency: stem:[P \approx kf^3]. Small increases in
+frequency (performance) require much larger increases in power.
+Conversely, small reductions in performance bring large reductions in
+power: A 5% performance drop brings close to 15% reduction in power.
+Both energy optimizer and dynamic performance optimizer rely on a
+technology known as dynamic voltage and frequency scaling (dvfs)
+available on most major CPU/GPU architectures.
+
+Of course, the CPU is only one part of a server, power supply, memory,
+storage, networking, and cooling all consume non-negligible power.
+Nevertheless, under load, the dominant energy/power consumers are the
+CPU and GPU.
+
+
+
+=== Energy Optimizer Energy optimizer (eo) is something of a
+misnomerfootnote:[Deceptive marketing?] as it does absolutely nothing to
+optimize energy usage. Instead it provides two functions:
+
+* Historical reporting of energy and temperature of data centre
+equipment * Apply upper limits to cap instantaneous power draw of
+servers (CPU or GPU)
+
+
+
+=== Dynamic power optimizer The dynamic power optimizer (dpo) adjusts
+the performance of CPU cores using voltage/frequency scaling to the near
+real-time processing load of a compute node. DPO only operates on CPUs –
+it does not affect GPUs. It is installed on each host that is to be
+optimized and works fully in-band.
+
+
+=== Where SEMS fits in
+Before we look at the details of Energy Optimizer and Dynamic Power
+Optimizer, we need to understand the overall architecture of an HPC
+system and where and how SEMS fits in to this organization. In the
+process we'll take a detour down the rabbit hole of containers.

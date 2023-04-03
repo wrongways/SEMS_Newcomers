@@ -1,0 +1,154 @@
+== Containers
+Atos' offers two solutions for cluster management, SMC and SMC&nbsp;xScale. Both
+use container technology. SMC uses podman, SMC&nbsp;xScale uses kubernetes. It
+turns out that the distinction between the two has an unreasonably
+largefootnote:[In my opinion] repercussion
+on all sorts of things from how the structure of the git repository, to the
+ansible playbooks, to the documentation. It is therefore necessary to introduce
+this material before looking in detail at the SEMS constituent parts. This
+chapter introduces containers before looking at the specifics of podman and kubernetes.
+
+Containers are a light-weight virtualization technology providing an isolated execution
+environment for applications that run on Linux. They are an evolution of BSD&nbps;Jails,
+and *chroot* before that. A container has it's own namespace and applications
+running inside a container have no visibility of other containers or the host OS.
+The most common container environment is Docker, but there are others such as Podman (OCI-R),
+Linux containers, Rocket, and Cloud Foundry.
+
+Compared to virtual machines, containers are much smaller and faster to deploy and tear down.
+The key advantage of containers is that they give precise control over the environment
+in which an application executes – which versions of tools, languages, libraries, and
+packages. The isolation between containers allows for one application to be running
+Python&nbsp;v3.9 and another using Python&nbsp;v3.10 on the same serverfootnote:[Of course
+this is also possible using python virtual environments].
+
+A second benefit of containers is that their contents and construction are described
+in code, as a configuration file. This allows easy integration into a CI/CD workflow
+for build, test and deployment.
+
+Containers are frequently used for applications deployed on a cloud infrastructure. They
+map particularly well with the notion of _micro-services_ where each specific function
+runs in its own container – for example in a typical three-tier application, the web-server,
+application server (middleware), and database will each have their own container. This
+allows for independent scaling of each of the components, for example, it is possible to
+have two instances of the front-end web server if needed, without changing the anything
+in the back-end.
+
+Using Linux's resource constraints (`cgroups`), containers can be limited in the amount
+of memory, CPU, network that they
+consume, limiting the noisy neighbour effect to a degree. Containers can also help with
+security, file systems can be mounted
+as read-only and the kernel filesystem is always read-only. Podman (see below)
+allows for non-root users to create and control their own containers.
+This means that should a bad actor manage to break out of a container, the damage she/he
+may inflict is considerably more limited that it would be were the container running with
+root privilegesfootnote:[Docker allows this too, but it is rarely used in practice] and
+unfettered write access to the file-system.
+
+It's not all a bed of roses though, despite what you might hear the evangelists telling you.
+Containers multiply the number of things that can go wrong and diagnosing the causes
+is intrinsically more complicated with so many more moving pieces.
+Network interfaces and storage devices breed like rabbits and they all have to be
+managed. Also, because we never
+occupy resources at 100%, we always leave some margin, the amount of unused and unusable
+disk space tends to be greater when using containers and micro-services than when the same
+application runs in a single OS instance. Each container has to be managed with updates,
+backups and the usual lifecycle stuff.
+
+
+=== Pods
+Frequently any given service is made up of two or more closely related functions for which
+it makes sense to deploy as as single unit. For this podman and kubernetes (see below)
+introduce the notion of _pods_, a (small) number of containers treated as a single entity
+(for deploy, start, stop, ...).
+
+
+=== Container engines
+The executable that runs in a container is known as an image. A container is a running
+imagefootnote:[or an image that has run in the past - the command `podman ps --all` shows
+both running and non-running containers]. Images are stored locally or
+in an image repository which may be public or private. The most well-known public image
+repository is https://hub.docker.com[Docker hub].
+
+A container engines perform three key roles:
+
+[horizontal]
+Image construction:: Define the contents of an image and the steps required to build it.
+Container and pod construction:: Configure containers and pods to run on a given system.
+Runtime:: Services to control the container/pod lifecycle (start, stop, ...). The two
+most common runtimes are `runc` and `crun`. `crun` is the more modern and faster of the two.
+
+=== Container images
+A container image comprises three elements:
+
+* A directory tree containing all the software and libraries that make up your application.
+The root of this tree becomes the root filesystem, _rootfs_, (under `/`) of the container.
+* A JSON file describing the contents of the _rootfs_.
+* A manifest, also in JSON format, that ties the image to one or more specific processor
+architectures – you cannot deploy an image built for IBM PowerPC on an ARM-based server.
+
+These three elements are bundled into a standard UNIX tar file. This tar file is then generally
+pushed to an image repository. Container systems such as podman or docker, then download and
+unpack the image onto a host. Then, the container system can launch the container runtime
+(`runc` or `crun` typically) which uses the JSON file to configure the host container and
+launch in turn the application.
+
+
+=== Podman vs Docker
+The two most common container engines are podman and dockerfootnote:[Don't confuse docker the
+tool with **D**ocker the company.].
+Podman is a modern drop-in replacement for Docker. Arriving after docker it has benefitted
+from all the lessons learnt and offers, in my view, several improvements over its
+predecessor, these include:
+
+Podman supports pods:: It's in the name, podman allows grouping of tightly coupled
+containers into a single pod which is then managed as a unit.
+
+Podman is a command, not a daemon:: This detail brings considerable benefits, especially
+when upgrading the container runtime. Docker runs as a daemon and shutting docker down
+requires that all the containers are shut down too. Podman, run on-demand as command, exits
+once its operation is complete and the containers remain operational. Therefore updating
+podman can take place without any interruption of service.
++
+Podman follows the UNIX _fork/exec_ paradigm and as such a container is a child process of
+podman belonging to the UID of the user that executed the command. Under docker, the
+container is a child of the docker daemon (`containerd`) rather than the docker client.
+
+Non-root user containers:: Ordinary, unprivileged users can create images and podman
+containers. An ever-increasing number of companies are outlawing root access – I don't
+even have root access on my company laptopfootnote:[Which turns out to be a right royal
+pain in the proverbial and a self-inflicted denial of service as it slows my productivity by a significant
+factor.] Docker's approach of putting users in the `docker` group is fraught with danger
+as it allows for a simple escape out of a container into the host OS.
+
+Podman plays nicely with _systemd_:: Much to the chagrin of many, _systemd_ has become
+the standard Linux intialization mechanism.
+Docker has traditionally resisted all attempts to integrate
+with systemd, maintaining that only docker should control the container lifecycle.
+Podman allows
+* systemd to manage the lifecyle of containers
+* containers to have their own systemd
+* send systemd notifications
+* socket activation in a container
+
+Podman is compatible with kubernetes:: Podman can produce and read configuration files in
+the format used by kubernetes which greatly simplifies migrating between the two and can
+help when debugging kubernetes deployment problems.
+
+The podman command line is a superset of that of docker – if you set `alias docker=podman` in
+your `.zsh` or `.bashrc` file, then everything should continue to work as expected, otherwise it's
+considered a bug by the podman teamfootnote:[Of course `docker --help` will now produce podman help
+which may or may not come as a surprise].
+
+
+The only way to come to grips with the technology is to install it on a machine and to kick the tyres.
+The next section gives a quick run-down of podman operation.
+
+=== Podman
+==== Installation
+The https:://podman.io[podman website] has all the details with https://podman.io/getting-started/installation[instructions on how to install
+on MacOS and Linux (and Windows if you don't know any better)]
+
+To grasp
+=== Kubernetes
+k8s for the hip.

@@ -1,0 +1,33 @@
+== Subjects
+
+* Intro
+** Project goals
+*** EO
+*** DPO
+* Architecture and operation
+** HPC clusters
+*** Control plane
+*** Production plane
+** EO
+*** Monitoring/Graphite
+*** Capping
+** DPO
+* Deployment Environments
+** Intro
+** SMC
+** SMC xScale
+*** SMC xScale services
+*** Things that should be done
+**** Use the monitoring database
+* Containers
+** Docker
+** Podman
+** Kubernetes
+** Ansible
+* Development environments
+** Documentation
+** Bitbucket
+*** Directories
+** Build & Software factory
+*** Jenkins
+** Accessing a cluster
