@@ -1,0 +1,15 @@
+podman run public.ecr.aws/nginx/nginx:1-alpine-perl bash
+Trying to pull public.ecr.aws/nginx/nginx:1-alpine-perl...
+Getting image source signatures
+Copying blob 1f21f983520d done
+Copying blob 3e1e579c95fe done
+Copying blob 59b9d2200e63 done
+Copying blob f56be85fc22e done
+Copying blob 547a97583f72 done
+Copying blob 2ce963c369bc done
+Copying blob c23b4f8cf279 done
+Copying blob e670ea6a5405 done
+Copying config f7cfde6d48 done
+Writing manifest to image destination
+Storing signatures
+

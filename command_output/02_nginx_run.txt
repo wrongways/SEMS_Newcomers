@@ -1,0 +1,2 @@
+% podman run --detach --name web_serv -v $PWD/html:/usr/share/nginx/html:ro -p 8080:8080 public.ecr.aws/nginx/nginx:1-alpine-perl
+c7a620715ebbb9bf0997f94311011707fd27a7aa08f14e2d1073402ba9f41cde
