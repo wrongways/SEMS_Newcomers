@@ -1,3 +1,5 @@
+:icons: font
+
 == Containers
 Atos' offers two solutions for cluster management, SMC and SMC&nbsp;xScale. Both
 use container technology. SMC uses podman, SMC&nbsp;xScale uses kubernetes. It
@@ -117,8 +119,9 @@ container is a child of the docker daemon (`containerd`) rather than the docker 
 Non-root user containers:: Ordinary, unprivileged users can create images and podman
 containers. An ever-increasing number of companies are outlawing root access – I don't
 even have root access on my company laptopfootnote:[Which turns out to be a right royal
-pain in the proverbial and a self-inflicted denial of service as it slows my productivity by a significant
-factor.] Docker's approach of putting users in the `docker` group is fraught with danger
+pain in the proverbial and a self-inflicted denial of service as it slows my productivity
+by a significant factor.]
+Docker's approach of putting users in the `docker` group is fraught with danger
 as it allows for a simple escape out of a container into the host OS.
 
 Podman plays nicely with _systemd_:: Much to the chagrin of many, _systemd_ has become
@@ -137,8 +140,8 @@ help when debugging kubernetes deployment problems.
 
 The podman command line is a superset of that of docker – if you set `alias docker=podman` in
 your `.zsh` or `.bashrc` file, then everything should continue to work as expected, otherwise it's
-considered a bug by the podman teamfootnote:[Of course `docker --help` will now produce podman help
-which may or may not come as a surprise].
+considered a bug by the podman teamfootnote:[Of course `docker --help` will now produce podman
+help which may or may not come as a surprise].
 
 
 The only way to come to grips with the technology is to install it on a machine and to kick the tyres.
@@ -147,8 +150,160 @@ The next section gives a quick run-down of podman operation.
 === Podman
 ==== Installation
 The https:://podman.io[podman website] has all the details with https://podman.io/getting-started/installation[instructions on how to install
-on MacOS and Linux (and Windows if you don't know any better)]
+on MacOS and Linux (or Windows if you don't know any better)]
 
-To grasp
+=== Images
+https://hub.docker.com/search[Docker hub] and https://gallery.ecr.aws[Amazon] host a
+multitude of container images. Some are
+officially sanctioned, others are made available by developers of varying abilities, some
+good, some less so. You can download any of these images and use it as-is or use as a base
+for customization. Without creating an account at https://docker.com[Docker (the company)]
+you are quickly rate limited. I tend to opt for Amazon.
+
+For the the following discussion will use the official nginx image.
+
+To run and connect to this image's shell, you can use the following command
+
+[source, shell]
+----
+% podman run -it --rm public.ecr.aws/nginx/nginx:1-alpine-perl sh
+----
+
+The command line options are the following:
+
+[horizontal]
+-i:: Interactive, keep _stdin_ open.
+-t:: Attach a pseudo terminal. This option is generally used for
+a throw-away shell as in our example.
+--rm:: Remove the container when it exits.
+public.ecr.aws/nginx/nginx:1-alpine-perl:: The fully qualified name of the image to load.
+sh:: The command to run. This is frequently optional as many containers have a default
+executable. For nginx, without surprise, the default command is to run the http server.
+
+Podman downloads the *nginx* image from docker hub (other imagage repositories can be configured)
+in chunks (_blobs_) and saves it to a local cache. If you create a second container based on
+the same image, the download step will be elided.
+
+////
+TODO:
+Need the output of the podman run command here
+Also with some basic shell commands - cat /etc/os-release, ps, ls -F / or tree /
+////
+
+==== Running the containerized application
+In our first contact with podman containers you ran the zsh/bash shell. This is not the
+application that the image builder had in mind. Here's how to run the nginx http server
+as intended.
+
+First create a directory to hold a html files and add a home page:
+
+[source, shell]
+----
+% mkdir html
+% cat <<EOF > html/index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>My first containerized web server</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="Wrongways Skidmark">
+  <sytle>
+      :root {
+          font-family: system-ui, ui-sans-serif, helvetica;
+      }
+
+      h1 {
+          color: red;
+          font-weight: 200;
+      }
+</head>
+<body>
+  <h1>This is my first containerized web page 🏆</h1>
+  <p>It'll be amazing 🧨 if it works!</p>
+</body>
+</html>
+EOF
+----
+
+Now you have a web page, you can add it to your containerized nginx application when
+you launch it. Here's the command:
+
+[source, shell]
+----
+% podman run -d \ # <1>
+    --name  web_server \ # <2>
+    -v "${PWD}/html":/usr/share/nginx/html:ro \ # <3>
+    -p 8080:80 \ # <4>
+    nginx # <5>
+----
+
+// TODO: Add terminal output
+
+We no loner require an interactive session nor a terminal, so these option have been removed.
+The container will not be automatically deleted when it exits either. The new options are:
+
+<1> -d or `--detatch`, instructs podman to run the container in the background. The podman command
+will exit, leaving the container running.
+<2> --name – give the container a custom name
+<3> -v or --volume. Binds a directory on the host to a directory in the container. In this case
+maps the directory *html* you just created on the host to the directory that nginx uses to
+serve web pages. The *:ro* tag mounts the volume as read-only, so the container cannot modify
+the files on the host.
+<4> -p or `--publish`. Podman binds the container port (the second `8080`) to a host port (the first `8080`)
+providing a bridge from the host to the container. It is custom to use the same port on the host and the
+container where possible. Of course if you run a second instance of nginx, then the host's 8080 port
+is already take so you have to specify a different one. i.e. -p 8081:8080.
+<5> nginx – the image to launch.
+
+Now you can launch a browser on the host and connect to *http://localhost:8080/* and, if all goes to
+plan, you should see the spectacular page we wrote earlier.
+
+
+==== Stopping containers
+Now you have a running container - how do you kill it? Without much surprise:
+
+[source, shell]
+----
+% podman stop my_web_server
+----
+// TODO: Add terminal output
+
+You can also use the first part of the container ID instead of the name - it has to be sufficiently long
+to uniquely identify the container. By default podman will wait ten seconds for the container to
+gracefully exit before using the nuclear option with `SIGKILL`. You can control the grace time with the
+`-t` switch of the stop command.
+
+==== Restarting containers
+If you run `podman ps --all` (see below), you will see the *my_web_server* container, even though it is not running.
+You can re-run the container with the same options as when you first launched it by simply typing:
+
+[source, shell]
+----
+% podman start my_web_server
+----
+
+// TODO: Add terminal output
+
+You can now reconnect your web browser with the web server.
+
+The podman start command launches one or more containers, printing the container IDs. If you add the `-all`
+switch, all stopped containers will be relaunched.
+
+==== Listing containers
+As hinted at above, you can list containers using the `podman ps`
+
+// TODO: Add terminal output
+
+Without any options this command lists only running containers. the `--all` switch adds halted ones too.
+
+// TODO: Add terminal output
+
+==== Container and image details
+
+
+
+
+
 === Kubernetes
 k8s for the hip.
