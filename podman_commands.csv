@@ -1,0 +1,116 @@
+Command,Description
+https://docs.podman.io/en/latest/markdown/podman.1.html[podman],"(Pod Manager) Global Options, Environment Variables, Exit Codes, Configuration Files, and more"
+
+https://docs.podman.io/en/latest/markdown/podman-attach.1.html[attach],"Attach to a running container"
+
+https://docs.podman.io/en/latest/markdown/podman-auto-update.1.html[auto-update],"Auto update containers according to their auto-update policy"
+
+https://docs.podman.io/en/latest/markdown/podman-build.1.html[build],"Build an image using instructions from Containerfiles"
+
+https://docs.podman.io/en/latest/markdown/podman-commit.1.html[commit],"Create new image based on the changed container"
+
+https://docs.podman.io/en/latest/markdown/podman-container.1.html[container],"Manage Containers"
+
+https://docs.podman.io/en/latest/markdown/podman-cp.1.html[cp],"Copy files/folders between a container and the local filesystem"
+
+https://docs.podman.io/en/latest/markdown/podman-create.1.html[create],"Create but do not start a container"
+
+https://docs.podman.io/en/latest/markdown/podman-diff.1.html[diff],"Inspect changes on container’s file systems"
+
+https://docs.podman.io/en/latest/markdown/podman-events.1.html[events],"Show podman events"
+
+https://docs.podman.io/en/latest/markdown/podman-exec.1.html[exec],"Run a process in a running container"
+
+https://docs.podman.io/en/latest/markdown/podman-export.1.html[export],"Export container’s filesystem contents as a tar archive"
+
+https://docs.podman.io/en/latest/markdown/podman-generate.1.html[generate],"Generated structured data"
+
+https://docs.podman.io/en/latest/markdown/podman-healthcheck.1.html[healthcheck],"Manage Healthcheck"
+
+https://docs.podman.io/en/latest/markdown/podman-history.1.html[history],"Show history of a specified image"
+
+https://docs.podman.io/en/latest/markdown/podman-image.1.html[image],"Manage images"
+
+https://docs.podman.io/en/latest/markdown/podman-images.1.html[images],"List images in local storage"
+
+https://docs.podman.io/en/latest/markdown/podman-import.1.html[import],"Import a tarball to create a filesystem image"
+
+https://docs.podman.io/en/latest/markdown/podman-info.1.html[info],"Display podman system information"
+
+https://docs.podman.io/en/latest/markdown/podman-init.1.html[init],"Initialize one or more containers"
+
+https://docs.podman.io/en/latest/markdown/podman-inspect.1.html[inspect],"Display the configuration of a container or image"
+
+https://docs.podman.io/en/latest/markdown/podman-kill.1.html[kill],"Kill one or more running containers with a specific signal"
+
+https://docs.podman.io/en/latest/markdown/podman-kube.1.html[kube],"Play a pod"
+
+https://docs.podman.io/en/latest/markdown/podman-load.1.html[load],"Load an image from container archive"
+
+https://docs.podman.io/en/latest/markdown/podman-login.1.html[login],"Login to a container registry"
+
+https://docs.podman.io/en/latest/markdown/podman-logout.1.html[logout],"Logout of a container registry"
+
+https://docs.podman.io/en/latest/markdown/podman-logs.1.html[logs],"Fetch the logs of a container"
+
+https://docs.podman.io/en/latest/markdown/podman-machine.1.html[machine],"Manage podman’s virtual machine"
+
+https://docs.podman.io/en/latest/markdown/podman-manifest.1.html[manifest],"Create and manipulate manifest lists and image indexes"
+
+https://docs.podman.io/en/latest/markdown/podman-mount.1.html[mount],"Mount a working container’s root filesystem"
+
+https://docs.podman.io/en/latest/markdown/podman-network.1.html[network],"Manage Networks"
+
+https://docs.podman.io/en/latest/markdown/podman-pause.1.html[pause],"Pause all the processes in one or more containers"
+
+https://docs.podman.io/en/latest/markdown/podman-pod.1.html[pod],"Manage pods"
+
+https://docs.podman.io/en/latest/markdown/podman-port.1.html[port],"List port mappings or a specific mapping for the container"
+
+https://docs.podman.io/en/latest/markdown/podman-ps.1.html[ps],"List containers"
+
+https://docs.podman.io/en/latest/markdown/podman-pull.1.html[pull],"Pull an image from a registry"
+
+https://docs.podman.io/en/latest/markdown/podman-push.1.html[push],"Push an image to a specified destination"
+
+https://docs.podman.io/en/latest/markdown/podman-rename.1.html[rename],"Rename an existing container"
+
+https://docs.podman.io/en/latest/markdown/podman-restart.1.html[restart],"Restart one or more containers"
+
+https://docs.podman.io/en/latest/markdown/podman-rm.1.html[rm],"Remove one or more containers"
+
+https://docs.podman.io/en/latest/markdown/podman-rmi.1.html[rmi],"Removes one or more images from local storage"
+
+https://docs.podman.io/en/latest/markdown/podman-run.1.html[run],"Run a command in a new container"
+
+https://docs.podman.io/en/latest/markdown/podman-save.1.html[save],"Save image to an archive"
+
+https://docs.podman.io/en/latest/markdown/podman-search.1.html[search],"Search registry for image"
+
+https://docs.podman.io/en/latest/markdown/podman-secret.1.html[secret],"Manage podman secrets"
+
+https://docs.podman.io/en/latest/markdown/podman-start.1.html[start],"Start one or more containers"
+
+https://docs.podman.io/en/latest/markdown/podman-stats.1.html[stats],"Display a live stream of container resource usage statistics"
+
+https://docs.podman.io/en/latest/markdown/podman-stop.1.html[stop],"Stop one or more containers"
+
+https://docs.podman.io/en/latest/markdown/podman-system.1.html[system],"Manage podman"
+
+https://docs.podman.io/en/latest/markdown/podman-tag.1.html[tag],"Add an additional name to a local image"
+
+https://docs.podman.io/en/latest/markdown/podman-top.1.html[top],"Display the running processes of a container"
+
+https://docs.podman.io/en/latest/markdown/podman-unmount.1.html[unmount],"Unmounts working container’s root filesystem"
+
+https://docs.podman.io/en/latest/markdown/podman-unpause.1.html[unpause],"Unpause the processes in one or more containers"
+
+https://docs.podman.io/en/latest/markdown/podman-unshare.1.html[unshare],"Run a command in a modified user namespace"
+
+https://docs.podman.io/en/latest/markdown/podman-untag.1.html[untag],"Removes one or more names from a locally-stored image"
+
+https://docs.podman.io/en/latest/markdown/podman-version.1.html[version],"Display the Podman Version Information"
+
+https://docs.podman.io/en/latest/markdown/podman-volume.1.html[volume],"Manage volumes"
+
+https://docs.podman.io/en/latest/markdown/podman-wait.1.html[wait],"Block on one or more containers"

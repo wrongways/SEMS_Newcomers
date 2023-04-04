@@ -5,14 +5,18 @@ Atos' offers two solutions for cluster management, SMC and SMC&nbsp;xScale. Both
 use container technology. SMC uses podman, SMC&nbsp;xScale uses kubernetes. It
 turns out that the distinction between the two has an unreasonably
 largefootnote:[In my opinion] repercussion
-on all sorts of things from how the structure of the git repository, to the
+on all sorts of things from the structure of the git repository and
 ansible playbooks, to the documentation. It is therefore necessary to introduce
 this material before looking in detail at the SEMS constituent parts. This
 chapter introduces containers before looking at the specifics of podman and kubernetes.
 
 Containers are a light-weight virtualization technology providing an isolated execution
-environment for applications that run on Linux. They are an evolution of BSD&nbps;Jails,
-and *chroot* before that. A container has it's own namespace and applications
+environment for applications that run on Linux. They are an evolution of BSD&nbsp;Jails,
+and *chroot* before thatfootnote:[IBM had workload partitions as a knee-jerk reaction to
+Solaris' containers years before Linux containers and Docker
+became a thing, but IBM never realized what a great feature they were and as a result
+they were never fully developed – a major missed opportunity].
+A container has it's own namespace and applications
 running inside a container have no visibility of other containers or the host OS.
 The most common container environment is Docker, but there are others such as Podman (OCI-R),
 Linux containers, Rocket, and Cloud Foundry.
@@ -150,7 +154,7 @@ The next section gives a quick run-down of podman operation.
 === Podman
 ==== Installation
 The https:://podman.io[podman website] has all the details with https://podman.io/getting-started/installation[instructions on how to install
-on MacOS and Linux (or Windows if you don't know any better)]
+on MacOS and Linux] (or Windows if you don't know any better)
 
 === Images
 https://hub.docker.com/search[Docker hub] and https://gallery.ecr.aws[Amazon] host a
@@ -220,7 +224,7 @@ First create a directory to hold a html files and add a home page:
 </head>
 <body>
   <h1>This is my first containerized web page 🏆</h1>
-  <p>It'll be amazing 🧨 if it works!</p>
+  <p>It'll be amazing 🧨 if it works first time</p>
 </body>
 </html>
 EOF
@@ -265,7 +269,7 @@ Now you have a running container - how do you kill it? Without much surprise:
 
 [source, shell]
 ----
-% podman stop my_web_server
+% podman stop web_server
 ----
 // TODO: Add terminal output
 
@@ -280,7 +284,7 @@ You can re-run the container with the same options as when you first launched it
 
 [source, shell]
 ----
-% podman start my_web_server
+% podman start web_server
 ----
 
 // TODO: Add terminal output
@@ -300,9 +304,157 @@ Without any options this command lists only running containers. the `--all` swit
 // TODO: Add terminal output
 
 ==== Container and image details
+Podman has an inspect command to examine the details of containers and images.
+The output is in JSON format, so it's handy to have the https://stedolan.github.io/jq/[*`jq`*] command installed -
+*jq* is available as an installable package on most Linux distributions.
+
+[source, shell]
+----
+podman inspect web_server | jq -C | less -R
+----
+
+[horizontal]
+-C:: tells jq to use colour
+-R:: tells less to pass-through raw colour characters
+
+The top level structure is an array, with one element (index=0) containing a dictionary.
+jq can select specific elements in the JSON. For example to get the command, which is in
+the *Config* section with the key *Cmd* use:
+
+[source, shell]
+----
+podman inspect web_server | jq '[0].Config.Cmd'
+----
+
+When printing to the terminal, jq uses colour by default, so we don't need the `-C` switch.
+
+Alternatively, if you don't have *jq* installed you can use the clunky `--format` switch of the
+podman inspect command:
+
+[source, shell]
+----
+podman inspect web_server --format "Run command: {{.Config.Cmd}}"
+----
+
+You don't get any colour and you have to add your own text to identify each field. If you
+ask for the whole *Config* entry you get a bunch of untagged fields:
+
+[source, shell]
+----
+podman inspect web_server --format "Run command: {{.Config}}"
+----
+
+Compare this to:
+[source, shell]
+----
+podman inspect web_server | jq '[0].Config'
+----
+
+In a similar way you can inspect images:
+
+[source, shell]
+----
+podman image inspect image_id | image_name
+----
+
+Once again, *jq* is your friend to extract the stanzas you're interested in.
+
+[source, shell]
+----
+podman image inspect 3374720 | jq '.[0].Size'
+----
+
+==== Deleting images
+To remove an image you no longer require, freeing up disk space
+
+[source, shell]
+----
+podman rmi <image-id | image-name>
+----
+
+Or alternatively, use prune which removes images that aren't currently used by a container
+
+[source, shell]
+----
+podman image prune [-a]
+----
+
+NOTE: TODO: Output of `podman rmi <image-id | image-name>` and `podman image prune`
 
 
+==== Podman commands
+There is a plethora of additional podman commands. These are summarized in the table below. See
+https://docs.podman.io/en/latest/Commands.html[the podman site] for details.
 
+.Click here to see the full list of podman commands
+[%collapsible]
+====
+[stripes=hover]
+[frame=ends]
+[width=80%]
+[cols="2,9"]
+[%header]
+,====
+include::podman_commands.csv[]
+,====
+====
+
+
+=== Podman images
+So far the images we've seen have been provided by a registry. But SEMS is an application with a custom
+application. In this section we look at how you can build your own images.
+
+We (almost) always start from a base image from a repository and customize its content and behaviour.
+The base image might be just the base Linux operating system or it may include additional components
+such as Node.js, a database, or programming languages (python, rust, ruby, clang, gcc).
+
+Podman has a `build` command which invokes a tool called `buildah`
+
+Images are built incrementally
+
+NOTE: Need diagram with layered images: Linux -> + nginx -> my-app
+
+To see the components of your image use the `podman image tree <image-name>` command and to see the differences
+between two images use `podman image diff <img1> <img2> which lists files that have been added (A),
+removed (D), and changed \(C).
+
+NOTE: TODO Output of `podman image tree <image-name>`
+
+NOTE: TODO Output of `podman image diff <img1> <img2>`
+
+==== Building images
+To construct the simplest way is to populate a file called either *Containerfile* or *Dockerfile*, the
+latter to be able to compatible with docker. This file describes all the steps required to create
+your image:
+
+. identify the base image
+. set environment variables
+. install modules and packages
+. run arbitary commands
+. copy files from the host or the internet to the image
+. establish the working directory
+. stipulate the command to be run when the image is launched
+. specify the username that will own the executable
+. set tags and labels
+
+This file is usually in the root directory of your application.
+
+[source, shell]
+----
+% cat myapp/Containerfile
+FROM
+COPY index.html /usr/share/nginx/html/
+----
+
+With these files -- Containerfile and index.html -- in place you can build your image:
+
+[source, shell]
+----
+% podman build ./myapp
+----
+
+
+// TODO: Add output
 
 
 === Kubernetes
