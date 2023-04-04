@@ -1,0 +1,9 @@
+body {
+   font-family: system-ui, ui-sans-serif, helvetica;
+}
+
+img {
+   display: inline;
+   margin: auto;
+   width: 300px;
+}
