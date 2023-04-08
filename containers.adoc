@@ -427,17 +427,17 @@ To construct the simplest way is to populate a file called either *Containerfile
 latter to be able to compatible with docker. This file describes all the steps required to create
 your image:
 
-. identify the base image
-. set environment variables
-. install modules and packages
-. run arbitary commands
-. copy files from the host or the internet to the image
-. establish the working directory
-. stipulate the command to be run when the image is launched
-. specify the username that will own the executable
-. set tags and labels
+. Identify the base image
+. Set environment variables
+. Install modules and packages
+. Run arbitrary commands
+. Copy files from the host or the internet to the image
+. Establish the working directory
+. Stipulate the command to be run when the image is launched
+. Specify the username that will own the executable
+. Set tags and labels
 
-This file is usually in the root directory of your application.
+This file is usually in the root directory of your application. Here's a simple example:
 
 [source, shell]
 ----
