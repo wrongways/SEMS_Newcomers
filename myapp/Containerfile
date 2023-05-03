@@ -1,0 +1,7 @@
+FROM quay.io/jitesoft/nginx
+
+RUN mkdir /usr/local/nginx/html/css
+RUN mkdir /usr/local/nginx/html/images
+COPY html/ /usr/local/nginx/html/
+COPY css /usr/local/nginx/html/css/
+COPY images /usr/local/nginx/html/images/
