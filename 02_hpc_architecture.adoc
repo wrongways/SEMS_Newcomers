@@ -1,1 +1,8 @@
 == HPC Architecture
+
+=== Subjects
+
+* Overall architecture - management nodes, production nodes
+* SMC vs SMC xScale
+* SLURM
+
