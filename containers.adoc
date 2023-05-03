@@ -220,7 +220,7 @@ First create a directory to hold a html files and add a home page:
 </head>
 <body>
   <h1>This is my first containerized web page 🏆</h1>
-  <p>It'll be amazing 🧨 if it works!</p>
+  <p>It'll be amazing 🧨 if it works first time</p>
 </body>
 </html>
 EOF

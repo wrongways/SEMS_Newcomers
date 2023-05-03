@@ -1,3 +1,10 @@
+[quote,  Virgil, Georgies, Book2]
+----
+_Felix qui potuit rerum cognoscere causas._
+
+Lucky is he who has been able to understand the causes of things
+----
+
 == Introduction Collectively the HPC system providers, encouraged by a
 https://www.energy.gov/sites/prod/files/2013/09/f2/20130913-SEAB-DOE-
 Exascale-Initiative.pdf[2008 DARPA paper] have set themselves the
