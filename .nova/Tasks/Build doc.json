@@ -2,7 +2,7 @@
   "actions" : {
     "build" : {
       "enabled" : true,
-      "script" : " asciidoctor -w containers.adoc"
+      "script" : " asciidoctor -w --doctype book --out-file=sems_newcomers.html book.adoc"
     }
   }
 }
