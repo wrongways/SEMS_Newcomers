@@ -1,1 +1,23 @@
 = SEMS Newcomer's Guide
+
+
+== Build the documentation
+
+[source, shell]
+----
+$ asciidoctor -w --doctype book --out-file=sems_newcomers.html book.adoc
+----
+
+== Pre-requisites
+Need ruby - either version 2 or 3
+
+[source, shell]
+----
+$ sudo apt install -y ruby
+----
+
+and the asciidoctor gems
+[source, shell]
+----
+gem install asciidoctor asciidoctor-pdf
+----
